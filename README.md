@@ -1,31 +1,168 @@
-# Policy Optimization for Financial Decision-Making: Deep Learning vs. Offline RL
+# Shodh-AI: Loan Approval Policy Optimization  
+**Deep Learning vs Offline Reinforcement Learning for Credit Risk**
 
-**Author:** Hammad Shaikh  
-**Assessment:** Shodh AI - Machine Learning Internship Task
+Author: **Hammad Shaikh**  
+Assessment: **Shodh AI – Machine Learning Internship Task**  
+Report: `Hammad_Shaikh_Report_Shodh_AI.pdf`
 
 ---
 
 ## 📌 Executive Summary
-This project explores the transition from **predicting credit risk** to **optimizing financial returns**. Using the LendingClub dataset, I developed and compared two distinct AI systems:
-1.  **Supervised Deep Learning (DL):** A classifier optimized to predict default probability.
-2.  **Offline Reinforcement Learning (RL):** A Conservative Q-Learning (CQL) agent optimized to maximize portfolio value.
 
-**Core Finding:** While both models beat the human baseline, the **Optimized DL Model** proved superior. By strictly tuning the decision threshold to `0.25`, it reduced portfolio losses by **85%**, whereas the RL agent achieved a **26%** reduction.
+This project explores the transition from **predicting credit risk** to **optimizing financial returns**.  
+Using the LendingClub dataset (2007–2018), I designed and compared two AI systems:
+
+1. **Supervised Deep Learning (DL):** Predicts probability of default.  
+2. **Offline Reinforcement Learning (RL):** A Conservative Q-Learning (CQL) agent that optimizes portfolio value.
+
+### **Core Finding**
+While both models beat the human baseline, the **Optimized DL Model** was superior:
+
+- DL Policy reduced losses by **85%**
+- RL Policy reduced losses by **26%**
+
+This shows that **a well-tuned classifier can outperform offline RL when the “safe” action (Deny) is well-defined.**
 
 ---
 
 ## 📂 Repository Structure
 
-```text
-├── models/
-│   └── cql_loan_agent.pt            # Trained Offline RL Agent (Weights)
-│
-├── notebooks/
-│   ├── 01_data_preprocessing.ipynb         # Data cleaning, leakage removal, and scaling
-│   ├── 02_deep_learning.ipynb              # Training the MLP & Threshold Optimization
-│   ├── 03_offline_rl.ipynb                 # Reward engineering & Training CQL Agent
-│   └── 04_analysis_and_comparison.ipynb    # EPV calculation & Divergent Case Analysis
-│
-├── README.md                        # Project documentation
-├── requirements.txt                 # Python dependencies
-└── Hammad_Shaikh_Report_Shodh_AI.pdf # Final detailed report
+```bash
+models/
+ └── cql_loan_agent.pt                # Trained RL agent weights
+
+notebooks/
+ ├── 01_data_preprocessing.ipynb      # Cleaning, leakage removal, scaling
+ ├── 02_deep_learning.ipynb           # MLP training + threshold optimization
+ ├── 03_offline_rl.ipynb              # Reward engineering + CQL agent
+ └── 04_analysis_and_comparison.ipynb # EPV analysis + policy divergence
+
+README.md
+requirements.txt
+Hammad_Shaikh_Report_Shodh_AI.pdf     # Final 3-page report
+
+⚙️ 1. Environment Setup
+1.1 Clone the repository
+git clone https://github.com/Hammad-1105/Loan-Approval-Shodh-AI.git
+cd Loan-Approval-Shodh-AI
+
+1.2 Create a virtual environment
+python -m venv venv
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
+
+1.3 Install dependencies
+pip install -r requirements.txt
+
+📊 2. Dataset Requirement
+
+Download the LendingClub dataset:
+
+accepted_2007_to_2018.csv
+
+
+Place it inside:
+
+data/accepted_2007_to_2018.csv
+
+
+The notebooks automatically load it from this path.
+
+▶️ 3. How to Reproduce All Results
+
+Run the notebooks in order:
+
+STEP 1 — Data Preprocessing
+
+📌 Notebook: notebooks/01_data_preprocessing.ipynb
+
+This notebook:
+
+Removes 58 columns with >30% missing data
+
+Drops leakage features
+
+Performs one-hot encoding
+
+Applies StandardScaler
+
+Removes highly correlated features
+
+Produces a final cleaned dataset (61 features)
+
+Output: cleaned_data.csv
+
+STEP 2 — Deep Learning Classifier
+
+📌 Notebook: notebooks/02_deep_learning.ipynb
+
+This notebook:
+
+Trains the MLP (256 → 128 → 64 + dropout)
+
+Handles class imbalance
+
+Performs threshold tuning
+
+Reproduced Metrics:
+
+Metric	Value
+AUC	0.741
+F1-score	0.456
+Approval Rate	65.6%
+EPV	–$273.19
+STEP 3 — Offline RL (CQL Agent)
+
+📌 Notebook: notebooks/03_offline_rl.ipynb
+
+This notebook:
+
+Creates counterfactual Deny actions (reward = 0)
+
+Defines reward:
+
+Approve + Paid → +interest
+
+Approve + Default → –loan amount
+
+Trains Conservative Q-Learning
+
+Evaluates EPV
+
+Reproduced Metrics:
+
+Metric	Value
+Approval Rate	95.2%
+EPV	–$1,339.02
+STEP 4 — Final Analysis & Comparison
+
+📌 Notebook: notebooks/04_analysis_and_comparison.ipynb
+
+This notebook:
+
+Computes EPV for human, DL model, RL agent
+
+Evaluates strict vs lenient policies
+
+Analyzes divergence cases
+
+Recreates Applicant #45 example (DL denies, RL approves → default)
+
+Final Results Table (Task 4.1)
+Policy	EPV per loan	% Improvement vs Human
+Human Baseline	–$1,805.50	–
+RL Agent (CQL)	–$1,339.02	+26%
+Deep Learning (MLP)	–$273.19	+85%
+📌 4. Reproducibility Notes
+
+All results in the final report are generated by these notebooks.
+
+Running the four notebooks sequentially will reproduce:
+
+AUC, F1
+
+RL EPV
+
+Divergent case examples
+
+Final improvements table
